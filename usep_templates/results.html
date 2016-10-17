@@ -35,6 +35,10 @@
 	a.none_facet {
 		color: red;
 	}
+	img {
+		display: block;
+		float: left;
+	}
 </style>
 {% endblock %}
 
@@ -63,18 +67,24 @@
 		{% block result%}
 		<li>
 	          {% if result.image_url %}
-	          <img class="thumb" src="{{ result.image_url }}" alt="inscription_thumbnail" width="40" height="40"></img>
+	          <img class="thumb" src="{{ result.image_url }}" alt="inscription_thumbnail" width="60" height="60"></img>
 	          {% else %}
-	          <img class="thumb" src="{{ STATIC_URL }}usep/images/NoImageAvailable.jpg" alt="inscription_thumbnail" width="40" height="40"></img>
+	          <img class="thumb" src="{{ STATIC_URL }}usep/images/NoImageAvailable.jpg" alt="inscription_thumbnail" width="60" height="60"></img>
 	          {% endif %}
+	          <div>
 	          <a href="{{ result.url }}">{{ result.id }} </a>
-	          {% if show_dates %}
-	          <span class="date">(Between {{result.notBefore|era}} and {{result.notAfter|era}})</span>
-	          {% endif %}
 	          <span class="status">({{ result.status }})</span>
 	          {% if result.text_genre_desc %}
 	          <br/><span class="desc">{{result.text_genre_desc.0}}</span>
 	          {% endif %}
+	          {% if show_dates %}
+	          {% if result.notBefore_desc %}
+		          <span class="date real">{{result.notBefore_desc.0}}</span>
+	          {% else %}
+		          <span class="date">Between {{result.notBefore|era}} and {{result.notAfter|era}}</span>
+	          {% endif %}
+	          {% endif %}
+	          </div>
 	    </li>
 	    {% endblock result %}
 
@@ -92,31 +102,16 @@ No Results. <a href="../">Search again...</a>
 {% block facets%}
 <ul id="facets">
 <h4>{{results|length}} Total Results</h4>
-{% for facet,counts in facets.items %}
-{% block facet %}
-{% if counts %}
-	<li>
-		<h4>{{facet|tax}}</h4>
-		<ul class="facet_list">
-			{% for name,count in counts %}
-				<li>
-					{% if name == "none_value" %}
-					<a class="none_facet" href="{{url}}&amp;facet_{{facet}}={{name}}">
-						No Value ({{count}})
-					</a>
-					{% else %}
-					<a href="{{url}}&amp;facet_{{facet}}={{name}}">
-						{{name|tax}} ({{count}})
-					</a>
-					{% endif %}
-				</li>
-			{% endfor %}
-		</ul>
-	</li>
-{% endif %}
-{% endblock facet %}
-
-{% endfor %}
+{% include "usep_templates/facet_fragment.html" with facet=facets.status %}
+{% include "usep_templates/facet_fragment.html" with facet=facets.fake %}
+{% include "usep_templates/facet_fragment.html" with facet=facets.language %}
+{% include "usep_templates/facet_fragment.html" with facet=facets.text_genre %}
+{% include "usep_templates/facet_fragment.html" with facet=facets.object_type %}
+{% include "usep_templates/facet_fragment.html" with facet=facets.material %}
+{% include "usep_templates/facet_fragment.html" with facet=facets.condition %}
+{% include "usep_templates/facet_fragment.html" with facet=facets.writing %}
+{% include "usep_templates/facet_fragment.html" with facet=facets.char %}
+{% include "usep_templates/facet_fragment.html" with facet=facets.name %}
 </ul>
 
 {% endblock facets%}
